@@ -56,7 +56,7 @@
                     <action android:name="com.google.firebase.MESSAGING_EVENT"/>
                 </intent-filter>
             </service>
-            <service android:exported="true" android:name="com.gae.scaffolder.plugin.CheckLocationService">
+            <service android:name="com.gae.scaffolder.plugin.CheckLocationService">
                 <intent-filter>
                     <action android:name="android.intent.category.DEFAULT"/>
                 </intent-filter>
