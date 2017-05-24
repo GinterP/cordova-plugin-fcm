@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class CheckLocationService extends Service
 {
-    private static final String TAG = "FCMPlugin-CheckLocationService";
+    private static final String TAG = "FCMPlugin-CLS";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
