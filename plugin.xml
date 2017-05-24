@@ -41,6 +41,9 @@
     <!-- ANDROID CONFIGURATION -->
     <platform name="android">
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
             <activity android:exported="true" android:name="com.gae.scaffolder.plugin.FCMPluginActivity"
                       android:launchMode="singleTop">
                 <intent-filter>
@@ -78,6 +81,7 @@
 
         <source-file src="src/android/FCMPlugin.java" target-dir="src/com/gae/scaffolder/plugin"/>
         <source-file src="src/android/MyFirebaseMessagingService.java" target-dir="src/com/gae/scaffolder/plugin"/>
+        <source-file src="src/android/CheckLocationService.java" target-dir="src/com/gae/scaffolder/plugin"/>
         <source-file src="src/android/MyFirebaseInstanceIDService.java" target-dir="src/com/gae/scaffolder/plugin"/>
         <source-file src="src/android/FCMPluginActivity.java" target-dir="src/com/gae/scaffolder/plugin"/>
     </platform>
