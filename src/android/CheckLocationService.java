@@ -73,7 +73,7 @@ public class CheckLocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
