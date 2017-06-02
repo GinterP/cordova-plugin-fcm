@@ -34,14 +34,30 @@ public class CheckLocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            Log.d(TAG, receivedIntent.getExtras().get("data").toString());
+
+
+            Map<String, Object> data = new HashMap<String, Object>();
+
+            for (String key : receivedIntent.getExtras().keySet()) {
+                Object value = receivedIntent.getExtras().get(key);
+                Log.d(TAG, String.format("%s %s (%s)", key,
+                        value.toString(), value.getClass().getName()));
+                data.put(key, value);
+            }
+
+            // Log.d(TAG,.getExtras().get("data").toString());
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
-            sendNotification(
-                    "It's working",
-                    "Latitude: " + location.getLatitude() + " Longitude: " + location.getLongitude(),
-                    new HashMap()
-            );
+
+            FCMPlugin.sendPushPayload(data);
+
+      /*
+      sendNotification(
+        "It's working",
+        "Latitude: " + location.getLatitude() + " Longitude: " + location.getLongitude(),
+        new HashMap()
+      );
+      */
             stopSelf();
         }
 
@@ -75,8 +91,9 @@ public class CheckLocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
+        Log.e(TAG, intent == null ? "null" : "not null");
         receivedIntent = intent;
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     @Override
