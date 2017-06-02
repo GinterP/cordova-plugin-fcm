@@ -22,6 +22,7 @@ public class CheckLocationService extends Service {
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
+    private Intent receivedIntent = null;
 
     private class LocationListener implements android.location.LocationListener {
         Location mLastLocation;
@@ -33,6 +34,7 @@ public class CheckLocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
+            Log.d(TAG, receivedIntent.getExtra("data").toString());
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
             sendNotification(
@@ -80,6 +82,8 @@ public class CheckLocationService extends Service {
     public void onCreate() {
         Log.e(TAG, "onCreate");
         initializeLocationManager();
+        receivedIntent = getIntent();
+
         try {
             mLocationManager.requestLocationUpdates(
                     LocationManager.NETWORK_PROVIDER, LOCATION_INTERVAL, LOCATION_DISTANCE,
