@@ -58,7 +58,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     private void startService(Map<String, Object> data) {
         Intent intent = new Intent(this, CheckLocationService.class);
-        intent.putExtra("data", data);
+        for (String key : data.keySet()) {
+            intent.putExtra(key, data.get(key).toString());
+        }
         startService(intent);
     }
 
