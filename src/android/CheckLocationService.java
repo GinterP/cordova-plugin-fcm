@@ -34,7 +34,7 @@ public class CheckLocationService extends Service {
 
         @Override
         public void onLocationChanged(Location location) {
-            Log.d(TAG, receivedIntent.getExtra("data").toString());
+            Log.d(TAG, receivedIntent.getExtras().get("data").toString());
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
             sendNotification(
@@ -75,6 +75,7 @@ public class CheckLocationService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(TAG, "onStartCommand");
         super.onStartCommand(intent, flags, startId);
+        receivedIntent = intent;
         return START_STICKY;
     }
 
@@ -82,7 +83,6 @@ public class CheckLocationService extends Service {
     public void onCreate() {
         Log.e(TAG, "onCreate");
         initializeLocationManager();
-        receivedIntent = getIntent();
 
         try {
             mLocationManager.requestLocationUpdates(
