@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.telephony.TelephonyManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,7 +61,7 @@ public class CheckLocationService extends Service {
 
             // Log.d(TAG,.getExtras().get("data").toString());
             Log.e(TAG, "onLocationChanged: " + location);
-            Log.d(TAG, "serial number: " + getDeviceId);
+            Log.d(TAG, "serial number: " + getDeviceId());
 
             if (sentLocation != null && sentTimestamp != null) {
                 try {
