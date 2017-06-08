@@ -14,6 +14,9 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +25,8 @@ public class CheckLocationService extends Service {
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
+    private int TIMESTAMP_MAX_DIFF_MS = 10 * 60 * 1000;
+    private double DISTANCE_MAX_KM = 5.0;
     private Intent receivedIntent = null;
 
     private class LocationListener implements android.location.LocationListener {
@@ -35,6 +40,8 @@ public class CheckLocationService extends Service {
         @Override
         public void onLocationChanged(Location location) {
 
+            String sentLocation = null;
+            Long sentTimestamp = null;
 
             Map<String, Object> data = new HashMap<String, Object>();
 
@@ -43,13 +50,41 @@ public class CheckLocationService extends Service {
                 Log.d(TAG, String.format("%s %s (%s)", key,
                         value.toString(), value.getClass().getName()));
                 data.put(key, value);
+
+                if (key.equals("coords")) {
+                    sentLocation = (String) value;
+                } else if (key.equals("timestamp_sent")) {
+                    sentTimestamp = Long.parseLong((String) value);
+                }
             }
 
             // Log.d(TAG,.getExtras().get("data").toString());
             Log.e(TAG, "onLocationChanged: " + location);
-            mLastLocation.set(location);
 
-            FCMPlugin.sendPushPayload(data);
+            if (sentLocation != null && sentTimestamp != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(sentLocation);
+                    double distance = getDistanceFromLatLonInKm(location.getLatitude(), location.getLongitude(),
+                            Double.parseDouble(jsonObject.getString("latitude")), Double.parseDouble(jsonObject.getString("longitude")));
+
+                    if (System.currentTimeMillis() - sentTimestamp < TIMESTAMP_MAX_DIFF_MS) {
+                        if (distance <= DISTANCE_MAX_KM) {
+
+                            sendNotification("Notfall in deiner Nähe", "öffne die App um Genaueres zu erfahren", data);
+                        } else {
+                            Log.d(TAG, "outside of range (> 5km)");
+                        }
+                    } else {
+                        Log.d(TAG, "older than: " + (TIMESTAMP_MAX_DIFF_MS / 1000) + " seconds");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                Log.d(TAG, "sentLocation or sentTimestamp was null - sentLocation: " + sentLocation + "  sentTimestamp: " + sentTimestamp);
+            }
+            mLastLocation.set(location);
 
       /*
       sendNotification(
@@ -59,6 +94,21 @@ public class CheckLocationService extends Service {
       );
       */
             stopSelf();
+        }
+
+        private double getDistanceFromLatLonInKm(double lat1, double lon1, double lat2, double lon2) {
+            double R = 6371; // Radius of the earth in km
+            double dLat = this.deg2rad(lat2 - lat1);  // deg2rad below
+            double dLon = this.deg2rad(lon2 - lon1);
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+                            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in km
+        }
+
+        private double deg2rad(double deg) {
+            return deg * (Math.PI / 180);
         }
 
         @Override
