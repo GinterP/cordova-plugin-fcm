@@ -70,6 +70,9 @@ public class CheckLocationService extends Service {
                     if (System.currentTimeMillis() - sentTimestamp < TIMESTAMP_MAX_DIFF_MS) {
                         if (distance <= DISTANCE_MAX_KM) {
 
+
+
+
                             sendNotification("Notfall in deiner Nähe", "öffne die App um Genaueres zu erfahren", data);
                         } else {
                             Log.d(TAG, "outside of range (> 5km)");
@@ -194,6 +197,10 @@ public class CheckLocationService extends Service {
     }
 
     private void sendNotification(String title, String messageBody, Map<String, Object> data) {
+
+        Intent launchIntent = getActivity.getPackageManager().getLaunchIntentForPackage("com.cardiaccustodian.prototype");
+        startActivity(launchIntent);
+
         Intent intent = new Intent(this, FCMPluginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         for (String key : data.keySet()) {
