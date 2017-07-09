@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.content.pm.PackageManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,9 +72,11 @@ public class CheckLocationService extends Service {
                         if (distance <= DISTANCE_MAX_KM) {
 
 
+                            openApp("com.cardiaccustodian.prototype");
 
-
-                            sendNotification("Notfall in deiner Nähe", "öffne die App um Genaueres zu erfahren", data);
+                            FCMPlugin.sendPushPayload(data);
+                            // old
+                            // sendNotification("Notfall in deiner Nähe", "öffne die App um Genaueres zu erfahren", data);
                         } else {
                             Log.d(TAG, "outside of range (> 5km)");
                         }
@@ -198,9 +201,6 @@ public class CheckLocationService extends Service {
 
     private void sendNotification(String title, String messageBody, Map<String, Object> data) {
 
-        Intent launchIntent = getActivity.getPackageManager().getLaunchIntentForPackage("com.cardiaccustodian.prototype");
-        startActivity(launchIntent);
-
         Intent intent = new Intent(this, FCMPluginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         for (String key : data.keySet()) {
@@ -222,5 +222,16 @@ public class CheckLocationService extends Service {
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+    }
+    public boolean openApp(String packageName) {
+        PackageManager manager = getApplicationContext().getPackageManager();
+        Intent i = manager.getLaunchIntentForPackage(packageName);
+        if (i == null) {
+            return false;
+            //throw new PackageManager.NameNotFoundException();
+        }
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+        startActivity(i);
+        return true;
     }
 }
